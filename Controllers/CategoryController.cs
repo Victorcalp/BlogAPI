@@ -1,5 +1,7 @@
 ﻿using BlogAPI.Data;
+using BlogAPI.Extensions;
 using BlogAPI.Models;
+using BlogAPI.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,11 +24,11 @@ namespace BlogAPI.Controllers
             try
             {
                 var categories = await _context.Categories.ToListAsync();
-                return Ok(categories);
+                return Ok(new ResultViewModel<List<Category>>(categories)); //vai passar uma lista de categorias
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new ResultViewModel<Category>($"Error: {ex.StackTrace}"));
             }
         }
 
@@ -36,19 +38,20 @@ namespace BlogAPI.Controllers
             try
             {
                 var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
-                if (category == null) return NotFound();
+                if (category == null) return NotFound(new ResultViewModel<Category>("Conteudo não encontrado"));
 
-                return Ok(category);
+                return Ok(new ResultViewModel<Category>(category));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new ResultViewModel<Category>($"Erro: {ex.Message}"));
             }
         }
 
         [HttpPost("v1/categories")]
         public async Task<IActionResult> PostAsync(Category category)
         {
+            if (!ModelState.IsValid) return BadRequest(new ResultViewModel<Category>(ModelState.GetErrors()));
             try
             {
                 await _context.Categories.AddAsync(category);
@@ -57,11 +60,11 @@ namespace BlogAPI.Controllers
             }
             catch (DbUpdateException ex)
             {
-                return StatusCode(500, "05x01 - Não foi possivel incluir a categoria - " + ex.Message);
+                return StatusCode(500, new ResultViewModel<Category>("05x01 - Não foi possivel incluir a categoria - " + ex.Message));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "05x02 - Erro interno: " + ex.Message);
+                return StatusCode(500, new ResultViewModel<Category>("05x02 - Erro interno: " + ex.Message));
             }
         }
 
@@ -71,7 +74,7 @@ namespace BlogAPI.Controllers
             try
             {
                 var categories = await _context.Categories.FirstOrDefaultAsync(x => x.Id == id);
-                if (categories == null) return NotFound();
+                if (categories == null) return NotFound(new ResultViewModel<List<Category>>(ModelState.GetErrors()));
 
                 categories.Name = model.Name;
                 categories.Slug = model.Slug;
@@ -82,11 +85,11 @@ namespace BlogAPI.Controllers
             }
             catch (DbUpdateException ex)
             {
-                return StatusCode(500, "05x03 - Não foi possivel atualizar a categoria - " + ex.Message);
+                return StatusCode(500, new ResultViewModel<Category>("05x03 - Não foi possivel atualizar a categoria - " + ex.Message));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "05x04 - Erro interno - " + ex.Message);
+                return StatusCode(500, new ResultViewModel<Category>("05x04 - Erro interno - " + ex.Message));
             }
         }
 
@@ -96,7 +99,7 @@ namespace BlogAPI.Controllers
             try
             {
                 var categories = await _context.Categories.FirstOrDefaultAsync(x => x.Id == id);
-                if (categories == null) return NotFound();
+                if (categories == null) return NotFound(new ResultViewModel<Category>(ModelState.GetErrors()));
 
                 _context.Categories.Remove(categories);
                 await _context.SaveChangesAsync();
@@ -104,11 +107,11 @@ namespace BlogAPI.Controllers
             }
             catch (DbUpdateException ex)
             {
-                return StatusCode(500, "05x05 - Não foi possivel excluir a categoria - " + ex.Message);
+                return StatusCode(500, new ResultViewModel<Category>("05x05 - Não foi possivel excluir a categoria - " + ex.Message));
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "05x06 - Erro interno - " + ex.Message);
+                return StatusCode(500, new ResultViewModel<Category>("05x06 - Erro interno - " + ex.Message));
             }
         }
     }
