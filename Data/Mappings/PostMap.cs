@@ -43,7 +43,7 @@ namespace BlogAPI.Data.Mappings
                 post => post.HasOne<Tag>() //tag tem 1 post
                     .WithMany() //tag tem muitas posts
                     .HasForeignKey("PostId")
-                    .HasConstraintName("FK_PostTag_PostId")
+                    .HasConstraintName("FK_PostRole_PostId")
                     .OnDelete(DeleteBehavior.Cascade),
                 tag => tag.HasOne<Post>() //Tag tem 1 post
                     .WithMany() // Post tem muitas Tags

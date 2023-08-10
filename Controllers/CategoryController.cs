@@ -64,7 +64,7 @@ namespace BlogAPI.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new ResultViewModel<Category>("05x02 - Erro interno: " + ex.Message));
+                return StatusCode(500,   new ResultViewModel<Category>("05x02 - Erro interno: " + ex.Message));
             }
         }
 
