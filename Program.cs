@@ -40,6 +40,13 @@ var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
 
+//Carrega os valores de configuração
+Configuration.JwtKey = app.Configuration.GetValue<string>("JwtKey");
+
+var smtp = new Configuration.SmtpConfiguration();
+app.Configuration.GetSection("SmtpConfiguration").Bind(smtp);
+Configuration.Smtp = smtp;
+
 app.MapControllers();
 
 app.Run();
