@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlogAPI.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20230810005917_CreateDataBase")]
+    [Migration("20230814222438_CreateDataBase")]
     partial class CreateDataBase
     {
         /// <inheritdoc />
@@ -155,26 +155,28 @@ namespace BlogAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Bio")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(160)
+                        .HasColumnType("VARCHAR")
+                        .HasColumnName("Email");
 
                     b.Property<string>("Image")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(80)
-                        .HasColumnType("VARCHAR")
+                        .HasColumnType("NVARCHAR")
                         .HasColumnName("Name");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("VARCHAR")
+                        .HasColumnName("PasswordHash");
 
                     b.Property<string>("Slug")
                         .IsRequired()
