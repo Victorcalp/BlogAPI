@@ -1,4 +1,5 @@
-﻿using BlogAPI.Data;
+﻿using Blog.Services;
+using BlogAPI.Data;
 using BlogAPI.Extensions;
 using BlogAPI.Models;
 using BlogAPI.Service;
@@ -16,7 +17,7 @@ namespace BlogAPI.Controllers
 
         //FromService seria a mesma coisa que fazer a injeção de independecia(construtor)
         [HttpPost("v1/accounts")]
-        public async Task<IActionResult> Post([FromBody] RegisterViewModel model, [FromServices] Context context)
+        public async Task<IActionResult> Post([FromBody] RegisterViewModel model, [FromServices] EmailService emailService, [FromServices] Context context)
         {
             if (!ModelState.IsValid) return BadRequest(new ResultViewModel<string>(ModelState.GetErrors()));
 
@@ -34,6 +35,9 @@ namespace BlogAPI.Controllers
             {
                 await context.Users.AddAsync(user);
                 await context.SaveChangesAsync();
+
+                emailService.Send(user.Name, user.Email, "Bem vindo ao blog!", $"Sua senha é {password}");
+
                 return Ok(new ResultViewModel<dynamic>(
                     data: new
                     {

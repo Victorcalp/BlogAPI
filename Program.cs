@@ -1,3 +1,4 @@
+using Blog.Services;
 using BlogAPI;
 using BlogAPI.Data;
 using BlogAPI.Service;
@@ -30,7 +31,7 @@ void LoadConfiguration(WebApplication app)
     Configuration.JwtKey = app.Configuration.GetValue<string>("JwtKey");
 
     var smtp = new Configuration.SmtpConfiguration();
-    app.Configuration.GetSection("SmtpConfiguration").Bind(smtp); //.bind pega o JSON e converte para a classe smtp
+    app.Configuration.GetSection("Smtp").Bind(smtp); //.bind pega o JSON e converte para a classe smtp
     Configuration.Smtp = smtp;
 }
 
@@ -66,4 +67,5 @@ void ConfigureServices(WebApplicationBuilder builder)
     builder.Services.AddControllers();
     builder.Services.AddDbContext<Context>();
     builder.Services.AddTransient<TokenService>();
+    builder.Services.AddTransient<EmailService>();
 }
