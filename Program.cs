@@ -21,6 +21,8 @@ LoadConfiguration(app);
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseStaticFiles(); //para renderizar imagens
+
 app.MapControllers();
 
 app.Run();
