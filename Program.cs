@@ -16,6 +16,9 @@ ConfigureAuthentication(builder);
 ConfigureMvc(builder);
 ConfigureServices(builder);
 
+builder.Services.AddEndpointsApiExplorer(); //adiciona o swagger
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 LoadConfiguration(app);
@@ -32,6 +35,10 @@ app.UseResponseCompression(); //ativando metodo de compressão/cache
 app.UseStaticFiles(); //para renderizar imagens
 
 app.MapControllers();
+
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.Run();
 
