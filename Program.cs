@@ -5,6 +5,7 @@ using BlogAPI.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,8 +61,14 @@ void ConfigureAuthentication(WebApplicationBuilder builder)
 
 void ConfigureMvc(WebApplicationBuilder builder)
 {
-    //Configura o comportamento da API para desabilitar o filtro de ModelState do ASP.NET (validação automatica)
-    builder.Services.AddControllers().ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true);
+    builder.Services
+        .AddControllers().ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true) //Configura o comportamento da API para desabilitar o filtro de ModelState do ASP.NET (validação automatica)
+        .AddJsonOptions(x => //configura o json
+            {
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; //vai ignorar outros ciclos/nó
+                x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault; //quando tiver obj null ele não vai redenrizar, vai ignorar
+            }
+        );
 }
 
 void ConfigureServices(WebApplicationBuilder builder)
