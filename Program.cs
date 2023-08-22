@@ -3,7 +3,9 @@ using BlogAPI;
 using BlogAPI.Data;
 using BlogAPI.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.IdentityModel.Tokens;
+using System.IO.Compression;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -21,6 +23,8 @@ LoadConfiguration(app);
 //sempre nessa ordem
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseResponseCompression(); //ativando metodo de compressão/cache
 
 app.UseStaticFiles(); //para renderizar imagens
 
@@ -61,6 +65,19 @@ void ConfigureAuthentication(WebApplicationBuilder builder)
 
 void ConfigureMvc(WebApplicationBuilder builder)
 {
+    //configurando o cache
+    builder.Services.AddMemoryCache();
+    builder.Services.AddResponseCompression(options =>
+    {
+        // options.Providers.Add<BrotliCompressionProvider>();
+        options.Providers.Add<GzipCompressionProvider>();
+        // options.Providers.Add<CustomCompressionProvider>();
+    });
+    builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+    {
+        options.Level = CompressionLevel.Optimal;
+    });
+
     builder.Services
         .AddControllers().ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true) //Configura o comportamento da API para desabilitar o filtro de ModelState do ASP.NET (validação automatica)
         .AddJsonOptions(x => //configura o json
