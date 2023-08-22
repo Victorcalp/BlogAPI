@@ -4,6 +4,7 @@ using BlogAPI.Data;
 using BlogAPI.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IO.Compression;
 using System.Text;
@@ -18,6 +19,8 @@ ConfigureServices(builder);
 var app = builder.Build();
 
 LoadConfiguration(app);
+
+app.UseHttpsRedirection(); //faz encaminhamento para https
 
 //informa que precisa usar a autenticação e autorização
 //sempre nessa ordem
@@ -79,7 +82,8 @@ void ConfigureMvc(WebApplicationBuilder builder)
     });
 
     builder.Services
-        .AddControllers().ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true) //Configura o comportamento da API para desabilitar o filtro de ModelState do ASP.NET (validação automatica)
+        .AddControllers()
+        .ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true) //Configura o comportamento da API para desabilitar o filtro de ModelState do ASP.NET (validação automatica)
         .AddJsonOptions(x => //configura o json
             {
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; //vai ignorar outros ciclos/nó
@@ -90,8 +94,9 @@ void ConfigureMvc(WebApplicationBuilder builder)
 
 void ConfigureServices(WebApplicationBuilder builder)
 {
-    builder.Services.AddControllers();
-    builder.Services.AddDbContext<Context>();
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+    builder.Services.AddDbContext<Context>(options => options.UseSqlServer(connectionString));
     builder.Services.AddTransient<TokenService>();
     builder.Services.AddTransient<EmailService>();
 }
